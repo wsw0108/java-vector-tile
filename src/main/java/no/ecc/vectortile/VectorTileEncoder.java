@@ -152,11 +152,11 @@ public class VectorTileEncoder {
 
         // clip geometry
         if (geometry instanceof Point) {
-            if (!clipCovers(geometry)) {
+            if (!clipCovers(clipGeometry, geometry)) {
                 return;
             }
         } else {
-            geometry = clipGeometry(geometry);
+            geometry = clipGeometry(clipGeometry, geometry);
         }
 
         // if clipping result in MultiPolygon, then split once more
@@ -196,11 +196,11 @@ public class VectorTileEncoder {
     /**
      * A short circuit clip to the tile extent (tile boundary + buffer) for
      * points to improve performance. This method can be overridden to change
-     * clipping behavior. See also {@link #clipGeometry(Geometry)}.
+     * clipping behavior. See also {@link #clipGeometry(Geometry, Geometry)}.
      * 
      * @see https://github.com/ElectronicChartCentre/java-vector-tile/issues/13
      */
-    protected boolean clipCovers(Geometry geom) {
+    protected boolean clipCovers(Geometry clipGeometry, Geometry geom) {
         if (geom instanceof Point) {
             Point p = (Point) geom;
             return clipGeometry.getEnvelopeInternal().covers(p.getCoordinate());
@@ -211,12 +211,12 @@ public class VectorTileEncoder {
     /**
      * Clip geometry according to buffer given at construct time. This method
      * can be overridden to change clipping behavior. See also
-     * {@link #clipCovers(Geometry)}.
+     * {@link #clipCovers(Geometry, Geometry)}.
      *
      * @param geometry
      * @return
      */
-    protected Geometry clipGeometry(Geometry geometry) {
+    protected Geometry clipGeometry(Geometry clipGeometry, Geometry geometry) {
         try {
             Geometry original = geometry;
             geometry = clipGeometry.intersection(original);
